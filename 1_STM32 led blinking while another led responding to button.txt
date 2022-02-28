@@ -1,0 +1,57 @@
+// this is exercise coding for STM32F411 board kit
+// a challenge exercise to understand the need of interrupts
+
+// Purpose: without using interrupts, try to code only with GPIO 
+// to make 1 LED blinking every 1 second
+// while another led responsing smoothly and quickly with button.
+
+
+
+
+/* USER CODE BEGIN 2 */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+    uint32_t* GPIOA_MODER = (uint32_t*)0x40020000;
+    uint32_t* GPIOD_MODER = (uint32_t*)0x40020c00;
+    uint32_t* GPIOD_OTYPER = (uint32_t*)0x40020c04;
+    uint32_t* GPIOA_PUPDR = (uint32_t*)0x4002000c;
+    uint32_t* GPIOD_ODR = (uint32_t*)0x40020c14;
+    uint32_t* GPIOA_IDR = (uint32_t*)0x40020010;
+
+    *GPIOA_MODER &= ~(0b11<<0); // reset MODER_A va set gia tri 00 cho Input MODER_A
+    *GPIOD_MODER &= ~(0xff<<24); // reset MODER_D
+    *GPIOD_MODER |= (0b01010101<<24); //set value 01 MODER_D cho 4 chan PD12, PD13, PD14, PD15
+
+    *GPIOD_OTYPER &= ~(0b1111<<12); //push pull
+    *GPIOA_PUPDR &= ~(0b11<<0); // no pull up no pulldown
+
+    char OnOff = 0;
+
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+
+	  for (char i=1; i<=50; ++i)
+	  {
+	  if (i==1)
+	  	  	  {
+		  	  OnOff+=1; // moi khi vong lap FOR chay het 50 vong, i quay lai gia tri 1 thi thoi gian delay tong cong bang 1giay => OnOff tang len 1
+		  	  if (OnOff%2) *GPIOD_ODR |= (0b1<<15); //bat den PD15 neu OnOff la so chan
+		  	  else *GPIOD_ODR &= ~(0b1<<15);  // tat den neu OnOff la so le
+	  	  	  }
+	  if ( ( *GPIOA_IDR & 0b1 ) == 0b1 ) *GPIOD_ODR |= (0b1<<12);
+	  else *GPIOD_ODR &= ~(0b1<<12);
+	  HAL_Delay(20);  // moi vong lap FOR thi delay 20 miligiay
+	  }
+
+  }
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+  /* USER CODE END 3 */

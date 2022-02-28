@@ -1,3 +1,7 @@
+ // this is a part from codes STM32F411VE board kit
+ // making 4 LED a visual effect like running around faster and faster
+ 
+ 
  /* USER CODE BEGIN 2 */
 
   uint32_t* GPIOD_ODR = 0x40020c14;  // reset ODR tin hieu den LED

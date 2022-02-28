@@ -1,0 +1,91 @@
+ /* USER CODE BEGIN 2 */
+
+  uint32_t* GPIOD_ODR = 0x40020c14;  // reset ODR tin hieu den LED
+
+  void LED(const uint8_t LedNo, const uint8_t OnOff)
+  {  if (OnOff == 1)
+  	 {
+	  switch (LedNo)
+	  { case 1: *GPIOD_ODR |= 0b1<<12;
+		  break;
+	  case 2:  *GPIOD_ODR |= 0b1<<13;
+		  break;
+	  case 3:  *GPIOD_ODR |= 0b1<<14;
+	  		  break;
+	  case 4:  *GPIOD_ODR |= 0b1<<15;
+	  		  break;
+	  case 5:  *GPIOD_ODR |= 0b1<<12;
+	  		  break;
+	  case 6:  *GPIOD_ODR |= 0b1<<13;
+	  		  break;
+	  case 7:  *GPIOD_ODR |= 0b1<<14;
+	  		  break;
+	  case 8:  *GPIOD_ODR |= 0b1<<15;
+	  		  break;
+	  }
+  	 } else
+  	 {switch (LedNo)
+	  { case 1: *GPIOD_ODR &= ~(0b1<<12);
+		  break;
+	  case 2:  *GPIOD_ODR &= ~(0b1<<13);
+		  break;
+	  case 3:  *GPIOD_ODR &= ~(0b1<<14);
+	  		  break;
+	  case 4:  *GPIOD_ODR &= ~(0b1<<15);
+	  		  break;
+	  case 5:  *GPIOD_ODR &= ~(0b1<<12);
+	  		  break;
+	  case 6:  *GPIOD_ODR &= ~(0b1<<13);
+	  		  break;
+	  case 7:  *GPIOD_ODR &= ~(0b1<<14);
+	  		  break;
+	  case 8:  *GPIOD_ODR &= ~(0b1<<15);
+	  		  break;
+	  }
+  	 }
+  }
+
+  LED(1,1);
+  HAL_Delay(150);
+  uint32_t t = 150;
+  uint8_t i = 1;
+  
+  
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+
+	  while (t>10)
+	  {
+	  if (i!=8) LED(i+1,1); else LED(1,1);
+	  if (i!=1) LED(i-1,0); else LED(8,0);
+	  HAL_Delay(t);
+	  i+=1; if (i==9) i=1;
+	  if (i!=8) LED(i+1,1); else LED(1,1);
+	  if (i!=1) LED(i-1,0); else LED(8,0);
+	  HAL_Delay(t);
+	  if (i==8) t=t/1.1;
+	  }
+
+	  *GPIOD_ODR &= ~(0b1111<<12); //turn off all LED
+	  HAL_Delay(500);
+	  for (i=1;i<=3;++i)  ////blinking 3 times all LED
+	  {
+	  *GPIOD_ODR |= (0b1111<<12);
+	  HAL_Delay(500);
+	  *GPIOD_ODR &= ~(0b1111<<12);
+	  HAL_Delay(500);
+	  }
+
+	  HAL_Delay(500);
+	  t=150;
+	  i=1;
+  }
+  /* USER CODE END 3 */

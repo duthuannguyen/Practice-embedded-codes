@@ -1,0 +1,83 @@
+
+/* USER CODE BEGIN Includes */
+
+#include "memory.h"
+
+/* USER CODE END Includes */
+
+
+
+
+/* USER CODE BEGIN 0 */
+
+
+uint32_t* GPIOD_MODER = (uint32_t*) 0x40020C00; //khai bao port D
+uint32_t* GPIOD_OTYPER = (uint32_t*)0x40020C04;
+uint32_t* GPIOD_ODR = (uint32_t*)   0x40020C14;
+uint32_t* EXTI_PR = (uint32_t*)  0x40013c14;
+
+void XuLyNgat()
+{
+	if ( ( *GPIOD_ODR  & 0b1<<15 ) == 0b1<<15 ) *GPIOD_ODR &= (0b1<<15);
+	else *GPIOD_ODR |= (0b1<<15);
+	*EXTI_PR |= (0b1);
+}
+
+
+
+/* USER CODE END 0 */
+
+
+
+  /* USER CODE BEGIN 2 */
+
+  __HAL_RCC_GPIOD_CLK_ENABLE(); //  clock port D
+
+
+/* declare in file STM32F411VETX_FLASH.ld to use 1 Kb in SRAM for purpose of vector table
+
+  MEMORY
+  {
+  VTOR_RAM (xrw)  : ORIGIN = 0x20000000,   LENGTH = 1K
+  RAM    (xrw)    : ORIGIN = 0x20000400,   LENGTH = 127K
+  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 512K
+  }
+  
+ */
+  
+  memcpy((uint32_t*)0x20000000,(uint32_t*)0x08000000,408); // copy Vector table from Flash to SRAM
+  uint32_t* VTOR = (uint32_t*)0xE000ED08;
+  *VTOR |= (1<<29);  // switch vector table to SRAM instead of Flash memory
+
+
+  uint32_t* NVIC_EXTI = (uint32_t*)0x20000058;
+  *NVIC_EXTI = (  (uint32_t)XuLyNgat | 1); // provide address of interrupt handler function
+
+
+  uint32_t* NVIC_ISER0 = (uint32_t*)0xE000E100;
+  *NVIC_ISER0 |= 0b1<<6;  // enable EXTI_0
+
+
+
+  *GPIOD_MODER &= ~(0b11111111<<24);//reset
+  *GPIOD_MODER |= (0b01010101<<24);//set 01 : output
+  *GPIOD_OTYPER &= ~(0b1111<<12); //set 0 for PD12,13,14,15  push pull
+
+
+  uint32_t* EXTI_RTSR = (uint32_t*)0x40013c08;
+  uint32_t* EXTI_IMR = (uint32_t*) 0x40013C00;
+  *EXTI_IMR |= 1; // set mask IMR0 = 1
+  *EXTI_RTSR |=1; // set Rising edge trigger = 1
+
+
+  /* USER CODE END 2 */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+	  *GPIOD_ODR |= (0b1<<13);
+	  HAL_Delay(1000);
+	  *GPIOD_ODR &= ~(0b1<<13);
+	  HAL_Delay(1000);
+
+    /* USER CODE END WHILE */

@@ -11,12 +11,12 @@
 /* USER CODE BEGIN 0 */
 
 
-uint32_t* GPIOD_MODER = (uint32_t*) 0x40020C00; //khai bao port D
+uint32_t* GPIOD_MODER = (uint32_t*) 0x40020C00; //declare to use port D
 uint32_t* GPIOD_OTYPER = (uint32_t*)0x40020C04;
 uint32_t* GPIOD_ODR = (uint32_t*)   0x40020C14;
-uint32_t* EXTI_PR = (uint32_t*)  0x40013c14;
+uint32_t* EXTI_PR = (uint32_t*)  0x40013c14; // pending request register (see EXTI theory)
 
-void XuLyNgat()
+void XuLyNgat()   // customized interrupt handler function name
 {
 	if ( ( *GPIOD_ODR  & 0b1<<15 ) == 0b1<<15 ) *GPIOD_ODR &= (0b1<<15);
 	else *GPIOD_ODR |= (0b1<<15);
@@ -31,10 +31,10 @@ void XuLyNgat()
 
   /* USER CODE BEGIN 2 */
 
-  __HAL_RCC_GPIOD_CLK_ENABLE(); //  clock port D
+  __HAL_RCC_GPIOD_CLK_ENABLE(); // enable clock port D
 
 
-/* declare in file STM32F411VETX_FLASH.ld to use 1 Kb in SRAM for purpose of vector table
+/* to edit and declare in file STM32F411VETX_FLASH.ld to use 1 Kb in SRAM for purpose of vector table
 
   MEMORY
   {

@@ -1,4 +1,4 @@
-in this exercise I tried to apply PWM to control the brightness of the led PD15
+//in this exercise I tried to apply PWM to control the brightness of the led PD15
 
 
 uint32_t* GPIOD_MODER = (uint32_t*) 0x40020c00; 

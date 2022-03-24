@@ -1,0 +1,38 @@
+in this exercise I tried to apply PWM to control the brightness of the led PD15
+
+
+uint32_t* GPIOD_MODER = (uint32_t*) 0x40020c00; 
+uint32_t* GPIOD_AFRH = (uint32_t*) 0x40020c24;
+uint16_t* TIM4_PSC = (uint16_t*) 0x40000828;
+uint16_t* TIM4_ARR = (uint16_t*) 0x4000082c;
+uint16_t* TIM4_CR1 = (uint16_t*) 0x40000800;
+uint16_t* TIM4_CCMR2 = (uint16_t*)0x4000081c;
+uint16_t* TIM4_CCR4 = (uint16_t*) 0x40000840;
+uint16_t* TIM4_CCER = (uint16_t*) 0x40000820;
+
+__HAL_RCC_GPIOD_CLK_ENABLE(); //  clock for GPIO D
+    *GPIOD_MODER |= (0b10<<30);//set 10 for alternate function PD15
+    *GPIOD_AFRH |=  (0b10<<28);// set 0010 for AF2 (see datasheet alternate function mapping TIM4_CH4 & AF2)
+
+__HAL_RCC_TIM4_CLK_ENABLE(); // clock for TIM4
+    *TIM4_PSC = 160-1; //clock 16MHz / (1000Hz PWM x 100 ARR duty cycle)
+    *TIM4_ARR = 100-1; // auto-reload value = 100 (duty cycle 0~99)
+    *TIM4_CCMR2 |= ( (0b110<<12) | (0b1<<11)); // PWM mode 1 va enable output compare preload
+    *TIM4_CCER |= (1<<12);  // enable output compare mechanic  CC4E
+    *TIM4_CR1 |= 1;  // enable counter
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+	  for(int i=0;i<100;i++)
+	  	    {
+		      *TIM4_CCR4 = i;
+	  	      HAL_Delay(10);
+	  	    }
+	  	  for(int i=99;i>=0;i--)
+	  	 	{
+		      *TIM4_CCR4 = i;
+	  	 	  HAL_Delay(10);
+	  	 	}
+    /* USER CODE END WHILE */
